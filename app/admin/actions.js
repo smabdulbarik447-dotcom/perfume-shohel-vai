@@ -505,9 +505,14 @@ export async function saveContentAction(_prev, formData) {
     }
   }
   // Puro faka item (sob ghor khali) bad — mane oi item muche gelo
+  const oldImages = [];
   for (const [list, items] of Object.entries(posted)) {
+    oldImages.push(...(lists[list] || []).map((it) => it?.image));
     lists[list] = items.filter((it) => it && Object.entries(it).some(([f, v]) => f !== "image" && v));
   }
+  // Bodlano/muche fela chobi storage theke o muche
+  const keep = new Set(Object.keys(posted).flatMap((l) => lists[l].map((it) => it.image)));
+  await deleteImages(oldImages.filter((u) => u && !keep.has(u)));
   await saveSettings({ content: JSON.stringify({ text, lists }) });
   refreshAll();
   return { ok: true, at: Date.now() };

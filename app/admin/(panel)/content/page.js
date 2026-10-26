@@ -3,6 +3,7 @@ import { SECTIONS, getContent } from "@/lib/content";
 import { saveContentAction } from "../../actions";
 import SaveForm from "../SaveForm";
 import ResetContent from "./ResetContent";
+import ImageInput from "../ImageInput";
 
 // Ekta list (feature, perfume, pros...) er item gulo — sheshe ekta faka ghor notun item jog korar jonno
 function ListFields({ list, items }) {
@@ -13,7 +14,13 @@ function ListFields({ list, items }) {
       {rows.map((item, i) => (
         <div key={i} className={`content-item ${i === items.length ? "new" : ""}`}>
           <span className="content-num">{i === items.length ? "➕ নতুন" : `#${i + 1}`}</span>
-          {item.image !== undefined && <input type="hidden" name={`l.${list.key}.${i}.image`} defaultValue={item.image} />}
+          {list.image ? (
+            <div className="content-img">
+              <ImageInput name={`l.${list.key}.${i}.image`} defaultValue={item.image || ""} folder="products" />
+            </div>
+          ) : (
+            item.image !== undefined && <input type="hidden" name={`l.${list.key}.${i}.image`} defaultValue={item.image} />
+          )}
           {list.fields.map(([f, label, long]) => (
             <label key={f}>
               {label}
