@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { getSettings } from "@/lib/store";
-import { tg, tgEnabled, linkCode, getChats, BOT_USERNAME } from "@/lib/telegram";
+import { tg, tgEnabled, linkCode, getChats } from "@/lib/telegram";
 import { saveSettingsAction, setupTelegramWebhook } from "../../actions";
 import SaveForm from "../SaveForm";
 import { TestButton, DisconnectButton } from "./TelegramButtons";
@@ -17,16 +17,19 @@ export default async function TelegramPage() {
 
   const h = await headers();
   const host = h.get("x-forwarded-host") || h.get("host");
-  const base = host?.startsWith("localhost") ? "https://purfume-eta.vercel.app" : `https://${host}`;
+  const base = host?.startsWith("localhost") ? "https://perfume-shohel-vai.vercel.app" : `https://${host}`;
 
   const s = await getSettings();
   const chats = getChats(s);
-  const [hook, ...chatInfo] = await Promise.all([
+  // Bot er username token theke ashe — token bodlale link o nije bodlay
+  const [me, hook, ...chatInfo] = await Promise.all([
+    tg("getMe"),
     tg("getWebhookInfo"),
     ...chats.map((id) => tg("getChat", { chat_id: id })),
   ]);
   const webhookOk = hook?.result?.url?.endsWith("/api/telegram");
   const code = linkCode();
+  const BOT_USERNAME = me?.result?.username || "";
 
   return (
     <>
