@@ -1,0 +1,227 @@
+/* =====================================================================
+   Rongin layer — admin er shob jaygay gradient ar chokh-e pora rong.
+   admin.css + admin-theme.css er pore load hoy.
+   ===================================================================== */
+.adm {
+  --g-purple: linear-gradient(135deg, #7c3aed, #c026d3);
+  --g-pink: linear-gradient(135deg, #ec4899, #f43f5e);
+  --g-orange: linear-gradient(135deg, #f97316, #facc15);
+  --g-green: linear-gradient(135deg, #10b981, #84cc16);
+  --g-blue: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --g-teal: linear-gradient(135deg, #14b8a6, #22d3ee);
+  --g-red: linear-gradient(135deg, #ef4444, #f97316);
+  --g-gold: linear-gradient(135deg, #ffe08a, #f5b83d 55%, #e8922a);
+  --g-rainbow: linear-gradient(90deg, #7c3aed, #ec4899, #f97316, #facc15, #10b981, #3b82f6);
+}
+
+/* Status → gradient (chip, badge, pill, status box, order card) */
+.adm .st-pending { --sg: var(--g-blue); }
+.adm .st-confirmed { --sg: var(--g-green); }
+.adm .st-shipped { --sg: var(--g-purple); }
+.adm .st-delivered { --sg: var(--g-teal); }
+.adm .st-returned { --sg: var(--g-orange); }
+.adm .st-cancelled { --sg: var(--g-red); }
+.adm .chip[class*="st-"], .adm .badge[class*="st-"], .adm .pill[class*="st-"] {
+  background: var(--sg) !important; color: #fff !important; border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .12); text-shadow: 0 1px 1px rgba(0, 0, 0, .12);
+}
+.adm-status .st[class*="st-"] { background: var(--sg) !important; color: #fff; border: 0; }
+.adm-status .st::before { display: none; }
+
+/* Page title — rongin lekha */
+.adm-title {
+  background: var(--g-rainbow); -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: 700; font-size: 1.75rem;
+}
+
+/* Sidebar icon — protita menu alada rong */
+.adm-nav a:nth-child(12n + 1) .ico { color: #a78bfa; }
+.adm-nav a:nth-child(12n + 2) .ico { color: #60a5fa; }
+.adm-nav a:nth-child(12n + 3) .ico { color: #34d399; }
+.adm-nav a:nth-child(12n + 4) .ico { color: #fbbf24; }
+.adm-nav a:nth-child(12n + 5) .ico { color: #f472b6; }
+.adm-nav a:nth-child(12n + 6) .ico { color: #2dd4bf; }
+.adm-nav a:nth-child(12n + 7) .ico { color: #fb923c; }
+.adm-nav a:nth-child(12n + 8) .ico { color: #38bdf8; }
+.adm-nav a:nth-child(12n + 9) .ico { color: #4ade80; }
+.adm-nav a:nth-child(12n + 10) .ico { color: #22d3ee; }
+.adm-nav a:nth-child(12n + 11) .ico { color: #f87171; }
+.adm-nav a:nth-child(12n + 12) .ico { color: #c4b5fd; }
+.adm-nav a.active .ico { color: var(--a-gold) !important; }
+
+/* KPI card — pura gradient, sada lekha */
+.kpi { border: 0; color: #fff; }
+.kpi:nth-child(4n + 1) { background: linear-gradient(135deg, #7c3aed, #a855f7 60%, #c084fc); }
+.kpi:nth-child(4n + 2) { background: linear-gradient(135deg, #ec4899, #f43f5e 60%, #fb7185); }
+.kpi:nth-child(4n + 3) { background: linear-gradient(135deg, #0ea5e9, #3b82f6 60%, #6366f1); }
+.kpi:nth-child(4n + 4) { background: linear-gradient(135deg, #10b981, #059669 55%, #f59e0b 140%); }
+.kpi::before { background: rgba(255, 255, 255, .35); }
+.kpi::after { background: #fff; opacity: .12; width: 140px; height: 140px; }
+.kpi small, .kpi em span { color: rgba(255, 255, 255, .85) !important; }
+.kpi b { color: #fff; }
+.kpi em.up, .kpi em.down { color: #fff; background: rgba(255, 255, 255, .22); padding: 2px 8px; border-radius: 999px; }
+.kpi-ico { background: rgba(255, 255, 255, .22) !important; color: #fff; box-shadow: none; backdrop-filter: blur(4px); }
+
+/* Panels / box — upore rongin dag, heading e gradient */
+.panel, .adm-box { position: relative; overflow: hidden; }
+.panel::before, .adm-box::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--pg, var(--g-purple)); }
+.dash-grid > .panel:nth-child(3n + 1), .adm-box:nth-of-type(4n + 1) { --pg: var(--g-purple); }
+.dash-grid > .panel:nth-child(3n + 2), .adm-box:nth-of-type(4n + 2) { --pg: var(--g-orange); }
+.dash-grid > .panel:nth-child(3n + 3), .adm-box:nth-of-type(4n + 3) { --pg: var(--g-green); }
+.dash-grid.two > .panel:nth-child(1) { --pg: var(--g-blue); }
+.dash-grid.two > .panel:nth-child(2) { --pg: var(--g-pink); }
+.adm-box:nth-of-type(4n + 4) { --pg: var(--g-blue); }
+.panel-head h3, .adm-box > h3, .adm-form h3 {
+  background: var(--pg, var(--g-purple)); -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: 700;
+}
+
+/* Donut legend — rongin pill */
+.donut-legend a { background: #faf8ff; padding: 5px 10px; border-radius: 10px; border: 1px solid var(--a-line); }
+.donut-legend a:hover { background: #f3e8ff; }
+.donut > div { box-shadow: inset 0 0 0 6px #faf8ff; }
+
+/* Table header gradient */
+.adm-table th, .adm-table.t2 th { background: linear-gradient(90deg, #f3e8ff, #fce7f3, #ffedd5) !important; color: #5b21b6 !important; }
+.adm-table tbody tr:nth-child(even) { background: #fcfbff; }
+
+/* Mini list avatar + top product — ghure ghure rong */
+.mini-list li:nth-child(5n + 1) .avatar { background: var(--g-purple); color: #fff; }
+.mini-list li:nth-child(5n + 2) .avatar { background: var(--g-pink); color: #fff; }
+.mini-list li:nth-child(5n + 3) .avatar { background: var(--g-orange); color: #fff; }
+.mini-list li:nth-child(5n + 4) .avatar { background: var(--g-green); color: #fff; }
+.mini-list li:nth-child(5n + 5) .avatar { background: var(--g-blue); color: #fff; }
+.call-btn { background: var(--g-green); box-shadow: 0 4px 10px rgba(16, 185, 129, .35); }
+.top-list li { padding: 8px; border-radius: 12px; background: linear-gradient(90deg, #faf8ff, #fff); border: 1px solid var(--a-line); }
+.top-num b { background: var(--g-purple); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.top-num.low b { background: var(--g-red); -webkit-background-clip: text; background-clip: text; }
+
+/* Range tabs + order tabs */
+.range-tabs a:not(.active):hover, .adm .tabs button:not(.active):hover { background: #f3e8ff; }
+.adm .tabs button { background: #fff; border: 1px solid var(--a-line); font-weight: 600; }
+.adm .tabs button.active { background: var(--g-purple); color: #fff; }
+
+/* Order list */
+.adm .order[class*="st-"] {
+  border: 0; border-left: 0;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    var(--sg) border-box;
+  border: 2px solid transparent; border-left-width: 6px;
+}
+.adm .order-id { background: var(--sg, var(--g-purple)); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.05rem; }
+.adm .risk { border-radius: 999px; color: #fff !important; }
+.adm .risk.new { background: var(--g-blue) !important; }
+.adm .risk.good { background: var(--g-green) !important; }
+.adm .risk.mid { background: var(--g-orange) !important; }
+.adm .risk.bad { background: var(--g-red) !important; }
+.adm .badge.blocked { background: linear-gradient(135deg, #111827, #4b5563) !important; }
+.adm .order-prod b { background: var(--g-purple); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.25rem; }
+.adm .courier-send { background: var(--g-green); box-shadow: 0 4px 10px rgba(16, 185, 129, .3); }
+.adm .courier-send.pathao { background: var(--g-red); }
+.adm .courier-send.carrybee { background: var(--g-orange); }
+.adm .courier-chip { background: linear-gradient(90deg, #ccfbf1, #e0f2fe); }
+.adm .del { background: var(--g-red); color: #fff; }
+.adm .block-btn { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); }
+
+/* Order summary bar */
+.adm .order-summary div:nth-of-type(1) { background: linear-gradient(135deg, #ede9fe, #fae8ff); }
+.adm .order-summary div:nth-of-type(2) { background: linear-gradient(135deg, #dcfce7, #ecfccb); }
+.adm .order-summary div:nth-of-type(3) { background: linear-gradient(135deg, #ffe4e6, #ffedd5); }
+
+/* Buttons */
+.adm-btn { background: var(--g-purple); }
+.adm-btn:hover { background: var(--g-pink); }
+.adm-btn.ghost {
+  background: linear-gradient(#fff, #fff) padding-box, var(--g-purple) border-box;
+  border: 1.5px solid transparent; color: #6d28d9;
+}
+.adm-btn.ghost:hover { background: linear-gradient(#faf5ff, #faf5ff) padding-box, var(--g-pink) border-box; color: #db2777; }
+.adm-btn.danger { background: var(--g-red); color: #fff; }
+.adm-ok { background: var(--g-green); color: #fff !important; padding: 3px 10px; border-radius: 999px; font-size: .85rem; }
+
+/* Forms */
+.adm-form label { color: #4c1d95; }
+.adm-form input:not([type="checkbox"]):focus, .adm-form textarea:focus, .adm select:focus { background: #fff; }
+.adm-check input { accent-color: #c026d3; }
+.img-box { border-color: #c4b5fd; background: linear-gradient(135deg, #faf5ff, #fdf2f8); }
+.gal-add { background: linear-gradient(135deg, #faf5ff, #fff7ed); border-color: #c084fc; color: #7c3aed; }
+
+/* Onno page er card/box (fraud, courier...) */
+.adm-card { background: linear-gradient(160deg, #fff, #faf5ff); }
+.adm-card b { background: var(--g-purple); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.adm-icon.green { background: var(--g-green) !important; }
+.adm-icon.red { background: var(--g-red) !important; }
+.adm-icon.orange { background: var(--g-orange) !important; }
+.adm-icon.yellow { background: var(--g-gold) !important; }
+.adm-icon.blue { background: var(--g-blue) !important; }
+.adm-icon.purple { background: var(--g-purple) !important; }
+.fraud-always li { background: linear-gradient(90deg, #faf5ff, transparent); padding: 4px 8px; border-radius: 8px; }
+.webhook-url, .tg-code { background: linear-gradient(135deg, #faf5ff, #fff7ed); border-color: #c4b5fd; }
+.pixel-list code { background: var(--g-green); color: #fff; }
+.capi-row { background: linear-gradient(135deg, #faf5ff, #f0f9ff); }
+.manual-sum { background: linear-gradient(135deg, #faf5ff, #fff7ed); border-color: #e9d5ff; }
+.manual-sum .total { color: #7c3aed; }
+.adm-gallery img { box-shadow: 0 6px 14px rgba(124, 58, 237, .15); }
+
+/* Landing page text editor */
+.content-help code { background: #f3e8ff; color: #6d28d9; padding: 1px 6px; border-radius: 6px; font-size: .85rem; }
+.content-sec { padding: 0; }
+.content-sec > summary { list-style: none; cursor: pointer; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.content-sec > summary::-webkit-details-marker { display: none; }
+.content-sec > summary::after { content: "▾"; font-size: 1.2rem; color: #7c3aed; transition: transform .2s; }
+.content-sec[open] > summary::after { transform: rotate(180deg); }
+.content-sec > summary h3 { margin: 0; }
+.content-sec > form { padding: 0 20px 20px; }
+.content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.content-grid .wide { grid-column: 1 / -1; }
+.content-list { margin-top: 10px; display: grid; gap: 10px; }
+.content-list h4 { font-size: .95rem; color: #6d28d9; }
+.content-item {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; position: relative;
+  padding: 26px 12px 12px; border-radius: 14px; background: linear-gradient(135deg, #faf5ff, #fff7ed); border: 1px solid #e9d5ff;
+}
+.content-item.new { background: linear-gradient(135deg, #f0fdf4, #ecfeff); border: 1px dashed #34d399; }
+.content-num { position: absolute; top: 6px; left: 12px; font-size: .75rem; font-weight: 700; color: #7c3aed; }
+.content-item.new .content-num { color: #059669; }
+@media (max-width: 700px) { .content-grid { grid-template-columns: 1fr; } }
+
+/* WhatsApp confirm message button (order card) */
+.adm .wa-confirm { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff !important; padding: 1px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600; }
+.adm .wa-confirm.sent { background: linear-gradient(135deg, #94a3b8, #64748b); }
+.wa-preview { margin-top: 12px; background: linear-gradient(135deg, #dcfce7, #f0fdf4); border: 1px solid #86efac; border-radius: 14px 14px 14px 4px; padding: 10px 14px; max-width: 520px; }
+.wa-preview small { color: #15803d; font-weight: 600; }
+.wa-preview p { color: #14532d; white-space: pre-wrap; }
+.capi-steps code { word-break: break-word; }
+
+/* Bikri chart — ১৫ din, porishkar tarikh */
+.bars2 { gap: 6px; height: 230px; }
+.bars2-col { gap: 2px; }
+.bars2-pair { position: relative; gap: 3px; }
+.bars2-pair span { width: min(14px, 42%); }
+.bars2-val {
+  position: absolute; top: -2px; left: 50%; transform: translate(-50%, -100%);
+  font-style: normal; font-size: .72rem; font-weight: 700; color: #6d28d9;
+  background: #f3e8ff; padding: 0 6px; border-radius: 999px;
+}
+.bars2-col > small { font-size: .78rem !important; color: #4b5563 !important; font-weight: 600; line-height: 1.1; }
+.bars2-col.has > small:not(.bars2-sub) { color: #6d28d9 !important; }
+.bars2-col > small.bars2-sub { font-size: .66rem !important; color: #a78bfa !important; font-weight: 500; min-height: .8em; }
+.bars2-col:hover .bars2-pair span { filter: brightness(1.1); }
+@media (max-width: 600px) { .bars2 { gap: 3px; } .bars2-col > small { font-size: .68rem !important; } .bars2-val { font-size: .62rem; padding: 0 4px; } }
+
+/* Saamprotik order: 6-7 ta dekhay, baki gulo bhitore scroll kore */
+.recent-scroll { max-height: 400px; overflow-y: auto; border-radius: 12px; scrollbar-width: thin; scrollbar-color: #c4b5fd transparent; }
+.recent-scroll::-webkit-scrollbar { width: 6px; }
+.recent-scroll::-webkit-scrollbar-thumb { background: linear-gradient(#a855f7, #ec4899); border-radius: 6px; }
+.recent-scroll thead th { position: sticky; top: 0; z-index: 1; }
+.recent-tools { display: flex; align-items: center; gap: 12px; }
+.recent-limit { display: flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--a-muted); font-weight: 600; }
+.recent-limit select {
+  padding: 4px 26px 4px 10px; border-radius: 999px; font-weight: 700; color: #fff; cursor: pointer;
+  border: 0 !important; background: linear-gradient(135deg, #7c3aed, #c026d3) !important; appearance: none;
+  background-image: linear-gradient(135deg, #7c3aed, #c026d3) !important;
+}
+.recent-limit { position: relative; }
+.recent-limit::after { content: "▾"; position: absolute; right: 10px; color: #fff; font-size: .75rem; pointer-events: none; }
+.recent-limit option { color: #111827; background: #fff; }
