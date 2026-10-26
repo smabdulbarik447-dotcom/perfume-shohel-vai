@@ -40,10 +40,10 @@ export default async function Home() {
   const { s, products, delivery, main, oldPrice, content, vars, t } = await loadPage();
   const L = content.lists;
   const fill = (str) => fillTokens(str, vars);
-  // Mul product er chobi i upore boro kore dekhay, tarpor banner er chobi gulo
+  // Banner er chobi gulo i dekhay (prothom ta boro kore); banner khali thakle mul product er chobi
   const productImage = main.image || "/images/combo.png";
   const banners = s.gallery.split("\n").map((x) => x.trim()).filter(Boolean);
-  const gallery = [productImage, ...banners.filter((src) => src !== productImage)];
+  const gallery = banners.length ? banners : [productImage];
   const freeBoxes = Number(s.free_delivery_boxes) || 0;
   const info1 = freeBoxes > 0 ? t("info1_text") : `ঢাকা ${bn(delivery[0].charge)}৳ / বাইরে ${bn(delivery[1].charge)}৳`;
 
