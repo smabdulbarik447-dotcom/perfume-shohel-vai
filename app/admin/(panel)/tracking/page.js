@@ -11,7 +11,7 @@ export default async function TrackingPage() {
 
   return (
     <>
-      <h1 className="adm-title">ট্র্যাকিং কোড (Pixel/GTM)</h1>
+      <h1 className="adm-title">ট্র্যাকিং কোড (Pixel/TikTok/GTM)</h1>
       <p className="adm-muted adm-intro">
         শুধু আইডি দিন, পুরো কোড লাগবে না। ভিজিটরের ব্রাউজার থেকে PageView, ViewContent আর InitiateCheckout যায়।
         <b> Purchase অর্ডার আসার সাথে সাথে যায় না</b> — নিচের Conversions API সেট করলে আপনি অর্ডার কনফার্ম করলে তবেই যায়।
@@ -31,6 +31,11 @@ export default async function TrackingPage() {
               ))}
             </div>
           )}
+          <label>
+            TikTok Pixel ID <small className="adm-muted">(একাধিক হলে প্রতি লাইনে একটা — TikTok Ads Manager → Assets → Events → Web Events)</small>
+            <textarea name="tiktok_pixel" rows={2} defaultValue={s.tiktok_pixel} placeholder="যেমন: CABC123DEF456GHI789J" />
+            <small className="adm-muted">PageView, ViewContent, InitiateCheckout আর অর্ডার দিলে PlaceAnOrder যায়।</small>
+          </label>
           <label>
             Google Tag Manager ID
             <input name="gtm_id" defaultValue={s.gtm_id} pattern="[Gg][Tt][Mm]-[A-Za-z0-9]{4,12}" placeholder="যেমন: GTM-ABC1234" />

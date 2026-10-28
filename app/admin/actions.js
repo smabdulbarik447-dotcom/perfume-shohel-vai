@@ -12,6 +12,7 @@ import { getPathaoStores } from "@/lib/pathao";
 import { getCarrybeeStores } from "@/lib/carrybee";
 import { COURIERS, sendOrderToCourier, syncAllCouriers, autoSendOnConfirm, autoSendText } from "@/lib/courier";
 import { capiTokens } from "@/lib/fbcapi";
+import { bdCheckOrder } from "@/lib/bdcourier";
 import { afterStatusChange } from "@/lib/orderHooks";
 import { notifyNewOrder, syncOrder, statusChangeText, markDeleted, sendToAll, removeChat, tg } from "@/lib/telegram";
 
@@ -33,6 +34,15 @@ export async function logoutAction() {
 }
 
 /* ---------- Orders ---------- */
+
+// Order list er "🔍 চেক" — BD Courier e notun kore check kore
+export async function recheckCourier(id) {
+  await requireAdmin();
+  const r = await bdCheckOrder(id, { force: true });
+  refreshAdmin();
+  after(() => syncOrder(id));
+  return r?.error ? { error: r.error } : null;
+}
 
 export async function updateStatus(id, status) {
   await requireAdmin();
@@ -133,7 +143,10 @@ export async function convertIncomplete(phone) {
   // Call kore confirm kora order — auto courier chalu thakle eta o chole jay
   const auto = await autoSendOnConfirm(row.id);
   refreshAdmin();
-  after(() => notifyNewOrder(row.id));
+  after(async () => {
+    await bdCheckOrder(row.id);
+    await notifyNewOrder(row.id);
+  });
   after(() => afterStatusChange(row.id, "confirmed"));
   return auto;
 }
@@ -221,6 +234,18 @@ export async function saveSettingsAction(_prev, formData) {
   }
   // WhatsApp token khali rakhle purono ta i thake
   if ("wa_token" in values && !String(values.wa_token).trim()) delete values.wa_token;
+  // BD Courier key o tai — muchte "bdcourier_del" tik dite hoy
+  if ("bdcourier_key" in values && !String(values.bdcourier_key).trim()) delete values.bdcourier_key;
+  if ("bdcourier_del" in values) {
+    values.bdcourier_key = "";
+    delete values.bdcourier_del;
+  }
+  if ("tiktok_pixel" in values) {
+    const parts = String(values.tiktok_pixel).split(/[\s,]+/).filter(Boolean).map((x) => x.toUpperCase());
+    const bad = parts.filter((x) => !/^[A-Z0-9]{10,30}$/.test(x));
+    if (bad.length) return { error: `এগুলো সঠিক TikTok Pixel ID না: ${bad.join(", ")}` };
+    values.tiktok_pixel = [...new Set(parts)].slice(0, 10).join("\n");
+  }
   if ("fb_test_code" in values) values.fb_test_code = String(values.fb_test_code).trim().toUpperCase();
   await saveSettings(values);
   refreshAll();
@@ -478,7 +503,10 @@ export async function createManualOrder(_prev, formData) {
   // কনফার্মড hishebe dile auto courier chalu thakle shathe shathe courier e jay
   const auto = status === "confirmed" ? await autoSendOnConfirm(row.id) : null;
   refreshAdmin();
-  after(() => notifyNewOrder(row.id));
+  after(async () => {
+    await bdCheckOrder(row.id);
+    await notifyNewOrder(row.id);
+  });
   after(() => afterStatusChange(row.id, status));
   return { ok: true, at: Date.now(), code: orderCode(row.id, settings.brand), total, auto };
 }

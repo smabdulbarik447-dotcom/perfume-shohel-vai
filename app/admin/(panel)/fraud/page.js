@@ -57,6 +57,31 @@ export default async function FraudPage() {
             <li>✅ দাম সার্ভারে হিসাব হয় — কেউ দাম বদলে অর্ডার দিতে পারবে না</li>
             <li>✅ অর্ডার লিস্টে প্রতিটি কাস্টমারের আগের অর্ডার ও বাতিলের হিসাব দেখায়</li>
           </ul>
+
+          <h3 className="mt">
+            🚚 BD Courier চেক{" "}
+            {s.bdcourier_key ? <span className="pill st-delivered">✓ চালু</span> : <span className="pill st-cancelled">বন্ধ</span>}
+          </h3>
+          <p className="adm-muted">
+            নতুন অর্ডার এলেই কাস্টমারের নাম্বার সব কুরিয়ারে (Pathao, Steadfast, RedX...) চেক হয় — কতগুলো পার্সেল নিয়েছে আর কত %
+            ডেলিভারড। অর্ডার লিস্ট আর Telegram এ দেখাবে। Key পাবেন <b>bdcourier.com</b> → API।
+          </p>
+          <SaveForm action={saveSettingsAction}>
+            <label>
+              BD Courier API Key {s.bdcourier_key && <span className="adm-ok">✓ সেভ করা আছে</span>}
+              <input
+                name="bdcourier_key"
+                type="password"
+                autoComplete="new-password"
+                placeholder={s.bdcourier_key ? "•••••••• (বদলাতে নতুন key দিন)" : "API key পেস্ট করুন"}
+              />
+            </label>
+            {s.bdcourier_key && (
+              <label className="adm-check">
+                <input type="checkbox" name="bdcourier_del" /> key মুছে ফেলুন (চেক বন্ধ)
+              </label>
+            )}
+          </SaveForm>
         </div>
 
         <div className="adm-box">

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { updateStatus, updateNote, updateOrderInfo, deleteOrder, blockOrder, unblock, sendToCourier } from "../../actions";
+import { updateStatus, updateNote, updateOrderInfo, deleteOrder, blockOrder, unblock, sendToCourier, recheckCourier } from "../../actions";
 
 // Steadfast er status (Pathao er status English e ashe, sheta i dekhai)
 const COURIER_STATUS = {
@@ -125,6 +125,32 @@ function Risk({ h }) {
   );
 }
 
+// BD Courier: shob courier mile customer koto parcel nisse — "🔍" chaaple notun kore check
+function BdCheck({ o, run, enabled }) {
+  if (!enabled) return null;
+  let r = null;
+  try { r = JSON.parse(o.bd_check || ""); } catch {}
+  const recheck = () =>
+    run(async () => {
+      const res = await recheckCourier(o.id);
+      if (res?.error) alert(`BD Courier চেক হয়নি:\n${res.error}`);
+    });
+  if (!r) {
+    return <button className="risk new bd-btn" onClick={recheck}>🔍 কুরিয়ার রেকর্ড চেক করুন</button>;
+  }
+  const level = r.total === 0 ? "new" : r.ratio >= 80 ? "good" : r.ratio >= 50 ? "mid" : "bad";
+  const detail = r.couriers.map((c) => `${c.name}: ${c.success}/${c.total}`).join("\n");
+  return (
+    <span className={`risk ${level} bd-risk`} title={detail || undefined}>
+      {r.total === 0
+        ? "🚚 কুরিয়ার রেকর্ড নেই"
+        : `🚚 সাকসেস ${r.ratio}% • মোট ${r.total} • ডেলিভারড ${r.success} • বাতিল ${r.cancelled}`}
+      {r.reports > 0 && ` • ⚠️ ফ্রড রিপোর্ট ${r.reports}`}
+      <button className="bd-btn" title="আবার চেক করুন" onClick={recheck}>⟳</button>
+    </span>
+  );
+}
+
 const AREA = { inside: "ঢাকার ভেতরে", outside: "ঢাকার বাইরে" };
 
 const fmtDate = (iso) =>
@@ -152,7 +178,7 @@ function downloadCsv(rows) {
   a.click();
 }
 
-export default function OrdersTable({ orders, statuses, initialFilter, couriers = [], rangeLabel = "সব সময়" }) {
+export default function OrdersTable({ orders, statuses, initialFilter, couriers = [], rangeLabel = "সব সময়", bdEnabled = false }) {
   const router = useRouter();
   const [filter, setFilter] = useState(initialFilter);
   const [q, setQ] = useState("");
@@ -216,7 +242,10 @@ export default function OrdersTable({ orders, statuses, initialFilter, couriers 
                 {o.blocked && <span className="badge blocked">🚫 ব্লকড</span>}
                 <span className={`badge st-${o.status}`}>{label[o.status] || o.status}</span>
               </div>
-              <Risk h={o.history} />
+              <div className="risk-row">
+                <Risk h={o.history} />
+                <BdCheck o={o} run={run} enabled={bdEnabled} />
+              </div>
 
               <div className="order-body">
                 <CustomerInfo o={o} run={run} />

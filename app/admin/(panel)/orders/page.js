@@ -42,6 +42,7 @@ export default async function OrdersPage({ searchParams }) {
         statuses={STATUSES}
         initialFilter={STATUSES.some((s) => s.id === status) ? status : "all"}
         couriers={readyCouriers(settings).map((id) => COURIERS[id])}
+        bdEnabled={Boolean(settings.bdcourier_key)}
         orders={orders.filter((o) => inRange(o.created_at, range)).map((o) => ({
           ...o,
           id: Number(o.id),

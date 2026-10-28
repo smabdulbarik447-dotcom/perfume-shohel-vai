@@ -64,7 +64,7 @@ export default async function Home() {
 
   return (
     <>
-      <Tracking pixel={s.fb_pixel} gtm={s.gtm_id} />
+      <Tracking pixel={s.fb_pixel} tiktok={s.tiktok_pixel} gtm={s.gtm_id} />
       <VoicePlayer src={s.voice} />
       <div className="topbar">
         <span>{t("topbar")}</span>

@@ -14,6 +14,9 @@ function fbIds() {
   };
 }
 
+// TikTok event e kon package (content_id chara TikTok warning dey)
+const ttContent = (p) => ({ contents: p ? [{ content_id: String(p.id), content_name: p.name, content_type: "product" }] : [] });
+
 // text: admin > ল্যান্ডিং পেজ টেক্সট er lekha (na thakle nicher default)
 export default function OrderForm({ products, delivery, freeBoxes = 0, text = {} }) {
   const T = (k, d) => text[k] || d;
@@ -32,6 +35,7 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
     checkoutSent.current = true;
     window.fbq?.("track", "InitiateCheckout", { value: total, currency: "BDT", num_items: totalBoxes });
     window.dataLayer?.push({ event: "begin_checkout", value: total, currency: "BDT" });
+    window.ttq?.track("InitiateCheckout", { ...ttContent(selected), value: total, currency: "BDT" });
   }
 
   const selected = products.find((p) => p.id === pkg) || products[0];
@@ -88,6 +92,8 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
       if (!res.ok) throw new Error(data.error);
       // Purchase ekhane pathai na — admin কনফার্ম korle server theke (Conversions API) jay
       window.dataLayer?.push({ event: "order_placed", value: total, currency: "BDT" });
+      // TikTok e order (PlaceAnOrder) — Purchase/CompletePayment na, karon COD order ekhono confirm hoyni
+      window.ttq?.track("PlaceAnOrder", { ...ttContent(selected), value: total, currency: "BDT" });
       setStatus("done");
     } catch (err) {
       setStatus("idle");

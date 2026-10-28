@@ -4,6 +4,7 @@ import { sql, ensureTables } from "@/lib/db";
 import { getSettings, getProducts, deliveryOptions, deliveryCharge } from "@/lib/store";
 import { checkOrder, clientIp } from "@/lib/fraud";
 import { notifyNewOrder } from "@/lib/telegram";
+import { bdCheckOrder } from "@/lib/bdcourier";
 
 export async function POST(req) {
   const body = await req.json().catch(() => null);
@@ -47,8 +48,11 @@ export async function POST(req) {
     await sql`UPDATE products SET stock = GREATEST(stock - ${qty}, 0) WHERE id = ${product.id}`;
     await sql`DELETE FROM incomplete_orders WHERE phone = ${body.phone}`;
     revalidatePath("/admin", "layout");
-    // Customer ke wait na koriye Telegram e pathay
-    after(() => notifyNewOrder(row.id));
+    // Customer ke wait na koriye BD Courier check kore, tarpor (fol shoho) Telegram e pathay
+    after(async () => {
+      await bdCheckOrder(row.id);
+      await notifyNewOrder(row.id);
+    });
 
     return Response.json({ ok: true, id: Number(row.id) });
   } catch (err) {
