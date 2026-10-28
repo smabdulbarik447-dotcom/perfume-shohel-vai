@@ -3,6 +3,7 @@ import { sql, ensureTables, STATUSES, orderCode } from "@/lib/db";
 import { getSettings } from "@/lib/store";
 import { COURIERS, readyCouriers, trackingLink, courierName, courierIcon } from "@/lib/courier";
 import { waLink } from "@/lib/whatsapp";
+import { bdCheckOrder } from "@/lib/bdcourier";
 import { resolveRange, inRange } from "@/lib/dateRange";
 import RangeFilter from "../RangeFilter";
 import OrdersTable from "./OrdersTable";
@@ -18,6 +19,17 @@ export default async function OrdersPage({ searchParams }) {
     getSettings(),
     sql`SELECT kind, value FROM blocked`,
   ]);
+
+  // BD Courier check hoyni emon order (purono ba check fail) — page khullei nije theke check (ekbare 15 ta)
+  if (settings.bdcourier_key) {
+    const unchecked = orders.filter((o) => !o.bd_check).slice(0, 15);
+    await Promise.all(
+      unchecked.map(async (o) => {
+        const r = await bdCheckOrder(o.id);
+        if (r && !r.error) o.bd_check = JSON.stringify(r);
+      })
+    );
+  }
 
   // Protita phone er ager order er hishab — beshi বাতিল/রিটার্ন mane jhuki
   const history = {};
