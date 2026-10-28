@@ -13,6 +13,7 @@ import { getCarrybeeStores } from "@/lib/carrybee";
 import { COURIERS, sendOrderToCourier, syncAllCouriers, autoSendOnConfirm, autoSendText } from "@/lib/courier";
 import { capiTokens } from "@/lib/fbcapi";
 import { bdCheckOrder } from "@/lib/bdcourier";
+import { ttTokens } from "@/lib/ttcapi";
 import { afterStatusChange } from "@/lib/orderHooks";
 import { notifyNewOrder, syncOrder, statusChangeText, markDeleted, sendToAll, removeChat, tg } from "@/lib/telegram";
 
@@ -246,6 +247,21 @@ export async function saveSettingsAction(_prev, formData) {
     if (bad.length) return { error: `এগুলো সঠিক TikTok Pixel ID না: ${bad.join(", ")}` };
     values.tiktok_pixel = [...new Set(parts)].slice(0, 10).join("\n");
   }
+  // TikTok Events API token: "ttcapi_<pixelId>" — khali rakhle purono token thake, "ttcapidel_" tik dile muche
+  const ttFields = Object.keys(values).filter((k) => k.startsWith("ttcapi_") || k.startsWith("ttcapidel_"));
+  if (ttFields.length) {
+    const tokens = ttTokens(await getSettings());
+    for (const k of ttFields) {
+      if (k.startsWith("ttcapidel_")) {
+        delete tokens[k.slice(10)];
+      } else if (String(values[k]).trim()) {
+        tokens[k.slice(7)] = String(values[k]).trim();
+      }
+      delete values[k];
+    }
+    values.tt_capi = JSON.stringify(tokens);
+  }
+  if ("tt_test_code" in values) values.tt_test_code = String(values.tt_test_code).trim().toUpperCase();
   if ("fb_test_code" in values) values.fb_test_code = String(values.fb_test_code).trim().toUpperCase();
   await saveSettings(values);
   refreshAll();

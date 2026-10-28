@@ -1,5 +1,6 @@
 import { getSettings, pixelIds } from "@/lib/store";
 import { capiTokens } from "@/lib/fbcapi";
+import { ttPixelIds, ttTokens } from "@/lib/ttcapi";
 import { saveSettingsAction } from "../../actions";
 import SaveForm from "../SaveForm";
 
@@ -8,6 +9,9 @@ export default async function TrackingPage() {
   const ids = pixelIds(s.fb_pixel);
   const tokens = capiTokens(s);
   const withToken = ids.filter((id) => tokens[id]);
+  const ttIds = ttPixelIds(s.tiktok_pixel);
+  const ttTokensSaved = ttTokens(s);
+  const ttWithToken = ttIds.filter((id) => ttTokensSaved[id]);
 
   return (
     <>
@@ -34,7 +38,7 @@ export default async function TrackingPage() {
           <label>
             TikTok Pixel ID <small className="adm-muted">(একাধিক হলে প্রতি লাইনে একটা — TikTok Ads Manager → Assets → Events → Web Events)</small>
             <textarea name="tiktok_pixel" rows={2} defaultValue={s.tiktok_pixel} placeholder="যেমন: CABC123DEF456GHI789J" />
-            <small className="adm-muted">PageView, ViewContent, InitiateCheckout আর অর্ডার দিলে PlaceAnOrder যায়।</small>
+            <small className="adm-muted">PageView, ViewContent, InitiateCheckout আর অর্ডার দিলে PlaceAnOrder যায়। Purchase এর জন্য নিচে Access Token দিন।</small>
           </label>
           <label>
             Google Tag Manager ID
@@ -87,6 +91,54 @@ export default async function TrackingPage() {
             <label>
               Test Event Code <small className="adm-muted">(ঐচ্ছিক — Events Manager → Test Events এ দেখতে। টেস্ট শেষে মুছে দিন)</small>
               <input name="fb_test_code" defaultValue={s.fb_test_code} placeholder="যেমন: TEST12345" />
+            </label>
+          </SaveForm>
+        )}
+      </div>
+
+      <div className="adm-box adm-narrow">
+        <h3>
+          🎵 TikTok Events API — কনফার্ম করলে Purchase{" "}
+          {ttWithToken.length ? (
+            <span className="pill st-delivered">✓ চালু ({ttWithToken.length}/{ttIds.length} Pixel)</span>
+          ) : (
+            <span className="pill st-pending">সেট করা নেই</span>
+          )}
+        </h3>
+        <ul className="fraud-always capi-rules">
+          <li>🛒 নতুন অর্ডার → ব্রাউজার থেকে <b>PlaceAnOrder</b> যায় (সার্ভার থেকে কিছু না)</li>
+          <li>✅ আপনি <b>কনফার্ম</b> করলে (বা শিপড/ডেলিভারড) → সার্ভার থেকে <b>CompletePayment</b> যায়, টাকার পরিমাণসহ — একটা অর্ডারে একবারই</li>
+          <li>↩️ <b>রিটার্ন</b> করলে → <b>OrderReturned</b> ইভেন্ট যায়</li>
+        </ul>
+
+        {ttIds.length === 0 ? (
+          <p className="adm-err">আগে উপরে TikTok Pixel ID দিন।</p>
+        ) : (
+          <SaveForm action={saveSettingsAction}>
+            <p className="adm-muted adm-intro-sm">
+              প্রতিটি Pixel এর টোকেন: <b>TikTok Ads Manager → Tools → Events → Web Events → Pixel → Settings → Events API → Generate Access Token</b>।
+            </p>
+            {ttIds.map((id) => (
+              <div key={id} className="capi-row">
+                <label>
+                  Pixel <code>{id}</code> এর Access Token {ttTokensSaved[id] && <span className="adm-ok">✓ সেভ করা আছে</span>}
+                  <input
+                    name={`ttcapi_${id}`}
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder={ttTokensSaved[id] ? "•••••••• (বদলাতে নতুন টোকেন দিন)" : "টোকেন পেস্ট করুন"}
+                  />
+                </label>
+                {ttTokensSaved[id] && (
+                  <label className="adm-check">
+                    <input type="checkbox" name={`ttcapidel_${id}`} /> এই টোকেন মুছে ফেলুন
+                  </label>
+                )}
+              </div>
+            ))}
+            <label>
+              Test Event Code <small className="adm-muted">(ঐচ্ছিক — Events Manager → Test Events এ দেখতে। টেস্ট শেষে মুছে দিন)</small>
+              <input name="tt_test_code" defaultValue={s.tt_test_code} placeholder="যেমন: TEST12345" />
             </label>
           </SaveForm>
         )}

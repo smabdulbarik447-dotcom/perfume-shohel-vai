@@ -10,6 +10,7 @@ function fbIds() {
   return {
     fbp: cookie("_fbp"),
     fbc: cookie("_fbc") || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : ""),
+    ttp: cookie("_ttp"), // TikTok er browser cookie — confirm er por TikTok Events API te lage
     pageUrl: location.href.split("#")[0],
   };
 }

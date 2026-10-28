@@ -36,14 +36,15 @@ export async function POST(req) {
     // Facebook Conversions API er jonno (confirm er por Purchase e lage)
     const fbp = String(body.fbp || "").slice(0, 200);
     const fbc = String(body.fbc || "").slice(0, 300);
+    const ttp = String(body.ttp || "").slice(0, 200);
     const userAgent = String(req.headers.get("user-agent") || "").slice(0, 400);
     const pageUrl = String(body.pageUrl || "").slice(0, 400);
     const address = String(body.address).trim().slice(0, 500);
 
     const [row] = await sql`
-      INSERT INTO orders (name, phone, address, product, area, qty, total, ip, fbp, fbc, user_agent, page_url)
+      INSERT INTO orders (name, phone, address, product, area, qty, total, ip, fbp, fbc, ttp, user_agent, page_url)
       VALUES (${name}, ${body.phone}, ${address}, ${product.name}, ${area.id}, ${qty}, ${total}, ${ip},
-              ${fbp}, ${fbc}, ${userAgent}, ${pageUrl})
+              ${fbp}, ${fbc}, ${ttp}, ${userAgent}, ${pageUrl})
       RETURNING id`;
     await sql`UPDATE products SET stock = GREATEST(stock - ${qty}, 0) WHERE id = ${product.id}`;
     await sql`DELETE FROM incomplete_orders WHERE phone = ${body.phone}`;
