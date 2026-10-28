@@ -138,13 +138,15 @@ function BdCheck({ o, run, enabled }) {
   if (!r) {
     return <button className="risk new bd-btn" onClick={recheck}>🔍 কুরিয়ার রেকর্ড চেক করুন</button>;
   }
-  const level = r.total === 0 ? "new" : r.ratio >= 80 ? "good" : r.ratio >= 50 ? "mid" : "bad";
+  // BD Courier er ratio courier gulor % er gor — tai delivered ÷ mot diye nije hishab
+  const ratio = r.total ? Math.round((r.success / r.total) * 100) : 0;
+  const level = r.total === 0 ? "new" : ratio >= 80 ? "good" : ratio >= 50 ? "mid" : "bad";
   const detail = r.couriers.map((c) => `${c.name}: ${c.success}/${c.total}`).join("\n");
   return (
     <span className={`risk ${level} bd-risk`} title={detail || undefined}>
       {r.total === 0
         ? "🚚 কুরিয়ার রেকর্ড নেই"
-        : `🚚 সাকসেস ${r.ratio}% • মোট ${r.total} • ডেলিভারড ${r.success} • বাতিল ${r.cancelled}`}
+        : `🚚 সাকসেস ${ratio}% • মোট ${r.total} • ডেলিভারড ${r.success} • বাতিল ${r.cancelled}`}
       {r.reports > 0 && ` • ⚠️ ফ্রড রিপোর্ট ${r.reports}`}
       <button className="bd-btn" title="আবার চেক করুন" onClick={recheck}>⟳</button>
     </span>
