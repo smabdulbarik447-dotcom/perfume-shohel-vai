@@ -29,6 +29,7 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
   const [callBox, setCallBox] = useState(null);
   const formRef = useRef(null);
   const savedDraft = useRef("");
+  const precheckRef = useRef(null);
   const checkoutSent = useRef(false);
 
   // Customer form e prothom bar click/type korlei Pixel e InitiateCheckout (ekbar i)
@@ -65,6 +66,17 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
     fetch("/api/incomplete", { method: "POST", headers: { "Content-Type": "application/json" }, body: key }).catch(() => {});
   }
 
+  // 11 digit number lekha holei server e courier check shuru — order chaapar shomoy fol tayri thake
+  function precheck(e) {
+    const phone = e.target.value.trim();
+    if (!/^01[3-9]\d{8}$/.test(phone) || precheckRef.current?.phone === phone) return;
+    precheckRef.current = {
+      phone,
+      done: fetch("/api/precheck", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone }) })
+        .catch(() => {}),
+    };
+  }
+
   async function onSubmit(e) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
@@ -76,6 +88,8 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
     setError("");
     setStatus("loading");
     try {
+      // Ager courier check cholte thakle sheta sesh howa porjonto opekkha — tahole order e notun check lage na
+      if (precheckRef.current?.phone === phone) await precheckRef.current.done;
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -160,7 +174,7 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
           </label>
           <label>
             {T("phone_label", "মোবাইল নাম্বার")} <i>*</i>
-            <input name="phone" required inputMode="numeric" maxLength={11} placeholder="01XXXXXXXXX" />
+            <input name="phone" required inputMode="numeric" maxLength={11} placeholder="01XXXXXXXXX" onChange={precheck} />
           </label>
           <h3 className="ship-head">{T("shipping_title", "Shipping")}</h3>
           {freeBoxes > 0 && (
