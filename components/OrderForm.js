@@ -26,6 +26,7 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
   const [area, setArea] = useState(delivery[0].id);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [callBox, setCallBox] = useState(null);
   const formRef = useRef(null);
   const savedDraft = useRef("");
   const checkoutSent = useRef(false);
@@ -90,7 +91,15 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) {
+        // Courier rating kom — order na niye call korte boli
+        if (data.call) {
+          setStatus("idle");
+          setError("");
+          return setCallBox({ phone: data.call, text: data.error });
+        }
+        throw new Error(data.error);
+      }
       // Purchase ekhane pathai na — admin কনফার্ম korle server theke (Conversions API) jay
       window.dataLayer?.push({ event: "order_placed", value: total, currency: "BDT" });
       // TikTok e order (PlaceAnOrder) — Purchase/CompletePayment na, karon COD order ekhono confirm hoyni
@@ -193,8 +202,18 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
           </p>
           {error && <p className="error">{error}</p>}
           <button className="btn btn-block" disabled={status === "loading"}>
-            {status === "loading" ? "অপেক্ষা করুন..." : `${T("submit_btn", "অর্ডার করুন")}  ৳ ${tk(total)}`}
+            {status === "loading" ? "⏳ অর্ডার যাচাই হচ্ছে, একটু অপেক্ষা করুন..." : `${T("submit_btn", "অর্ডার করুন")}  ৳ ${tk(total)}`}
           </button>
+          {callBox && (
+            <div className="call-overlay" role="dialog" aria-modal="true" onClick={() => setCallBox(null)}>
+              <div className="call-box" onClick={(e) => e.stopPropagation()}>
+                <div className="call-icon">📞</div>
+                <p>{callBox.text}</p>
+                <a className="btn btn-block" href={`tel:${callBox.phone}`}>📞 কল করুন {callBox.phone}</a>
+                <button type="button" className="call-close" onClick={() => setCallBox(null)}>বন্ধ করুন</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </form>

@@ -81,6 +81,14 @@ export default async function FraudPage() {
                 <input type="checkbox" name="bdcourier_del" /> key মুছে ফেলুন (চেক বন্ধ)
               </label>
             )}
+            <label>
+              সর্বনিম্ন সাকসেস রেট (%) — এর কম হলে ওয়েবসাইটে অর্ডার হবে না
+              <input name="bdcourier_min_ratio" type="number" min="0" max="100" defaultValue={s.bdcourier_min_ratio} />
+              <small className="adm-muted">
+                কাস্টমারকে অর্ডার না নিয়ে আপনার নাম্বারে ({s.phone}) কল করতে বলা হবে। একদম নতুন কাস্টমার (কোনো পার্সেল নেই)
+                এর অর্ডার হবে। ০ দিলে বন্ধ। কল দিয়ে অর্ডার নিতে চাইলে “নতুন অর্ডার (কল)” থেকে বসান।
+              </small>
+            </label>
           </SaveForm>
         </div>
 

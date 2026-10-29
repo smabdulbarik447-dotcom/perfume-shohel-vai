@@ -4,7 +4,7 @@ import { sql, ensureTables } from "@/lib/db";
 import { getSettings, getProducts, deliveryOptions, deliveryCharge } from "@/lib/store";
 import { checkOrder, clientIp } from "@/lib/fraud";
 import { notifyNewOrder } from "@/lib/telegram";
-import { bdCheckOrder } from "@/lib/bdcourier";
+import { bdCheckOrder, bdLookup, bdRatio } from "@/lib/bdcourier";
 
 export async function POST(req) {
   const body = await req.json().catch(() => null);
@@ -22,6 +22,21 @@ export async function POST(req) {
     });
     if (problem?.silent) return Response.json({ ok: true, id: 0 });
     if (problem) return Response.json({ ok: false, error: problem.error }, { status: problem.status });
+
+    // BD Courier protection: ager parcel er success ratio kom hole order na niye call korte boli.
+    // Ekdom notun (kono parcel nei) ba API kaj na korle order hoy.
+    const minRatio = Number(settings.bdcourier_min_ratio) || 0;
+    const bd = settings.bdcourier_key && minRatio > 0 ? await bdLookup(body.phone, settings.bdcourier_key) : null;
+    if (bd && bd.total > 0 && bdRatio(bd) < minRatio) {
+      return Response.json(
+        {
+          ok: false,
+          call: settings.phone,
+          error: `দুঃখিত, এই নাম্বারে সরাসরি অর্ডার নেওয়া যাচ্ছে না। অর্ডার করতে অনুগ্রহ করে কল করুন: ${settings.phone}`,
+        },
+        { status: 403 }
+      );
+    }
 
     const product = products.find((p) => p.id === Number(body.productId));
     const area = deliveryOptions(settings).find((d) => d.id === body.area);
@@ -42,9 +57,9 @@ export async function POST(req) {
     const address = String(body.address).trim().slice(0, 500);
 
     const [row] = await sql`
-      INSERT INTO orders (name, phone, address, product, area, qty, total, ip, fbp, fbc, ttp, user_agent, page_url)
+      INSERT INTO orders (name, phone, address, product, area, qty, total, ip, fbp, fbc, ttp, user_agent, page_url, bd_check)
       VALUES (${name}, ${body.phone}, ${address}, ${product.name}, ${area.id}, ${qty}, ${total}, ${ip},
-              ${fbp}, ${fbc}, ${ttp}, ${userAgent}, ${pageUrl})
+              ${fbp}, ${fbc}, ${ttp}, ${userAgent}, ${pageUrl}, ${bd ? JSON.stringify(bd) : ""})
       RETURNING id`;
     await sql`UPDATE products SET stock = GREATEST(stock - ${qty}, 0) WHERE id = ${product.id}`;
     await sql`DELETE FROM incomplete_orders WHERE phone = ${body.phone}`;
