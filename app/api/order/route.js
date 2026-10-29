@@ -32,6 +32,7 @@ export async function POST(req) {
         {
           ok: false,
           call: settings.phone,
+          whatsapp: settings.whatsapp,
           error: "দুঃখিত, এই নাম্বারে আপনি অনেকগুলো অর্ডার ক্যানসেল করেছেন, তাই অনলাইনে অর্ডার নেওয়া যাচ্ছে না। অর্ডার করতে অনুগ্রহ করে কল করুন।",
         },
         { status: 403 }

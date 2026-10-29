@@ -110,7 +110,7 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
         if (data.call) {
           setStatus("idle");
           setError("");
-          return setCallBox({ phone: data.call, text: data.error });
+          return setCallBox({ phone: data.call, whatsapp: data.whatsapp, text: data.error.replace(/^দুঃখিত,\s*/, "") });
         }
         throw new Error(data.error);
       }
@@ -215,15 +215,25 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
             {T("privacy", "Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.")}
           </p>
           {error && <p className="error">{error}</p>}
-          {callBox && (
-            <>
-              <p className="error">{callBox.text}</p>
-              <a className="btn btn-block call-btn" href={`tel:${callBox.phone}`}>📞 এখনই কল করুন: {callBox.phone}</a>
-            </>
-          )}
           <button className="btn btn-block" disabled={status === "loading"}>
             {status === "loading" ? "⏳ অর্ডার যাচাই হচ্ছে, একটু অপেক্ষা করুন..." : `${T("submit_btn", "অর্ডার করুন")}  ৳ ${tk(total)}`}
           </button>
+          {callBox && (
+            <div className="call-overlay" role="dialog" aria-modal="true" onClick={() => setCallBox(null)}>
+              <div className="call-box" onClick={(e) => e.stopPropagation()}>
+                <div className="call-icon">📞</div>
+                <h3>দুঃখিত!</h3>
+                <p>{callBox.text}</p>
+                <a className="btn btn-block" href={`tel:${callBox.phone}`}>📞 কল করুন {callBox.phone}</a>
+                {callBox.whatsapp && (
+                  <a className="call-wa" href={`https://wa.me/${callBox.whatsapp}`} target="_blank" rel="noreferrer">
+                    💬 WhatsApp এ মেসেজ দিন
+                  </a>
+                )}
+                <button type="button" className="call-close" onClick={() => setCallBox(null)}>বন্ধ করুন</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </form>
