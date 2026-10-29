@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { updateStatus, updateNote, updateOrderInfo, deleteOrder, blockOrder, unblock, sendToCourier, recheckCourier } from "../../actions";
+import { updateStatus, updateNote, updateOrderInfo, deleteOrder, blockOrder, unblock, sendToCourier, recheckCourier, updateOrderTotal } from "../../actions";
 
 // Steadfast er status (Pathao er status English e ashe, sheta i dekhai)
 const COURIER_STATUS = {
@@ -110,6 +110,53 @@ function CustomerInfo({ o, run }) {
           বাতিল
         </button>
       </div>
+    </div>
+  );
+}
+
+// Order er taka — "✏️" chaaple taka bodlano ba delivery free kora jay
+function Amount({ o, run }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(String(o.total));
+
+  const apply = (change) =>
+    run(async () => {
+      const r = await updateOrderTotal(o.id, change);
+      if (r?.error) return alert(r.error);
+      if (r?.warning) alert(r.warning);
+      setValue(String(r.total));
+      setEditing(false);
+    });
+
+  const freeBtn = (
+    <button
+      type="button"
+      className={`adm-btn sm ${o.free_delivery ? "ghost" : ""}`}
+      onClick={() => apply({ freeDelivery: !o.free_delivery })}
+    >
+      {o.free_delivery ? "↩️ ডেলিভারি চার্জ যোগ করুন" : "🚚 ডেলিভারি ফ্রি করুন"}
+    </button>
+  );
+
+  if (!editing) {
+    return (
+      <>
+        <span className="amount">
+          <b>৳{o.total.toLocaleString("en-IN")}</b>
+          <button type="button" className="amount-edit" title="টাকা এডিট" onClick={() => { setValue(String(o.total)); setEditing(true); }}>✏️</button>
+        </span>
+        {o.free_delivery && <small className="free-tag">🚚 ফ্রি ডেলিভারি</small>}
+      </>
+    );
+  }
+  return (
+    <div className="amount-form">
+      <input type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} inputMode="numeric" />
+      <div className="edit-btns">
+        <button type="button" className="adm-btn sm" onClick={() => apply({ total: value })}>✓ সেভ</button>
+        <button type="button" className="adm-btn sm ghost" onClick={() => setEditing(false)}>বাতিল</button>
+      </div>
+      {freeBtn}
     </div>
   );
 }
@@ -254,7 +301,7 @@ export default function OrdersTable({ orders, statuses, initialFilter, couriers 
                 <div className="order-prod">
                   <span>{o.product || "—"}</span>
                   <small>Qty: {o.qty} • {AREA[o.area] || o.area}</small>
-                  <b>৳{o.total.toLocaleString("en-IN")}</b>
+                  <Amount o={o} run={run} />
                   <Courier o={o} run={run} couriers={couriers} />
                 </div>
               </div>

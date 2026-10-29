@@ -183,6 +183,10 @@
 .adm .order-prod { display: grid; gap: 2px; text-align: right; font-size: .9rem; }
 .adm .order-prod small { color: var(--a-muted); }
 .adm .order-prod b { font-size: 1.15rem; }
+.adm .amount-edit { border: 0; background: none; cursor: pointer; font-size: .85rem; padding: 0 0 0 6px; vertical-align: middle; }
+.adm .free-tag { color: #15803d !important; font-weight: 600; }
+.adm .amount-form { display: grid; gap: 6px; justify-items: end; }
+.adm .amount-form input { width: 130px; padding: 6px 10px; text-align: right; }
 .adm .order-actions { display: grid; grid-template-columns: 160px 1fr 44px 44px; gap: 8px; margin-top: 12px; }
 .adm .order-actions select, .adm .order-actions .note { padding: 7px 10px; }
 .adm .del { background: #fee2e2; border: 0; border-radius: 9px; cursor: pointer; }

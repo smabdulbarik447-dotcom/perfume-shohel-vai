@@ -68,15 +68,16 @@ export async function updateOrderInfo(id, info) {
   if (!name || !address) return { error: "নাম আর ঠিকানা খালি রাখা যাবে না" };
   if (!/^01[3-9]\d{8}$/.test(phone)) return { error: "সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন" };
 
-  const [o] = await sql`SELECT name, phone, address, area, product, qty, total, courier_id, courier FROM orders WHERE id = ${id}`;
+  const [o] = await sql`SELECT name, phone, address, area, product, qty, total, courier_id, courier, free_delivery FROM orders WHERE id = ${id}`;
   if (!o) return { error: "অর্ডার পাওয়া যায়নি" };
 
   // ঢাকার ভেতরে/বাইরে bodlale: purono delivery charge bad, notun ta jog (discount thakle seta thik thake)
+  // Delivery free kora thakle charge e hat dei na
   const settings = await getSettings();
   const areas = deliveryOptions(settings);
   const newArea = areas.find((a) => a.id === info?.area) || areas.find((a) => a.id === o.area);
   let total = o.total;
-  if (newArea && newArea.id !== o.area) {
+  if (newArea && newArea.id !== o.area && !o.free_delivery) {
     const product = (await getProducts({ all: true })).find((p) => p.name === o.product);
     const oldArea = areas.find((a) => a.id === o.area);
     const oldCharge = oldArea ? deliveryCharge(settings, oldArea, product, o.qty) : 0;
@@ -99,10 +100,46 @@ export async function updateOrderInfo(id, info) {
     ok: true,
     total,
     totalChanged: total !== o.total,
-    warning: o.courier_id
-      ? `অর্ডারটা আগেই ${COURIERS[o.courier || "steadfast"]?.name || "কুরিয়ার"} এ পাঠানো হয়েছে (${o.courier_id}) — ওখানে ঠিকানা/টাকা কুরিয়ারের প্যানেল থেকে বা কল করে বদলাতে হবে।`
-      : "",
+    warning: courierWarning(o),
   };
+}
+
+const courierWarning = (o) =>
+  o.courier_id
+    ? `অর্ডারটা আগেই ${COURIERS[o.courier || "steadfast"]?.name || "কুরিয়ার"} এ পাঠানো হয়েছে (${o.courier_id}) — ওখানে ঠিকানা/টাকা কুরিয়ারের প্যানেল থেকে বা কল করে বদলাতে হবে।`
+    : "";
+
+/**
+ * Order er taka bodlano. `total` dile oi taka boshay (discount ityadi);
+ * `freeDelivery` true/false dile delivery charge mot theke bad / abar jog kore.
+ */
+export async function updateOrderTotal(id, { total, freeDelivery } = {}) {
+  await requireAdmin();
+  const [o] = await sql`SELECT id, area, product, qty, total, courier_id, courier, free_delivery FROM orders WHERE id = ${id}`;
+  if (!o) return { error: "অর্ডার পাওয়া যায়নি" };
+
+  let next = o.total;
+  let free = o.free_delivery;
+  if (total !== undefined) {
+    next = Math.round(Number(total));
+    if (!Number.isFinite(next) || next < 0 || next > 10000000) return { error: "সঠিক টাকার পরিমাণ দিন" };
+  }
+  if (freeDelivery !== undefined && Boolean(freeDelivery) !== o.free_delivery) {
+    const settings = await getSettings();
+    const area = deliveryOptions(settings).find((a) => a.id === o.area);
+    const product = (await getProducts({ all: true })).find((p) => p.name === o.product);
+    const charge = area ? deliveryCharge(settings, area, product, o.qty) : 0;
+    if (!charge) return { error: "এই অর্ডারে ডেলিভারি চার্জ নেই (আগে থেকেই ফ্রি)" };
+    free = Boolean(freeDelivery);
+    next = Math.max(0, free ? next - charge : next + charge);
+  }
+  if (next === o.total && free === o.free_delivery) return { ok: true, total: next };
+
+  await sql`UPDATE orders SET total = ${next}, free_delivery = ${free} WHERE id = ${id}`;
+  refreshAdmin();
+  const what = free !== o.free_delivery ? (free ? "🚚 ডেলিভারি ফ্রি" : "🚚 ডেলিভারি চার্জ যোগ") : "💰 টাকা বদল";
+  after(() => syncOrder(id, { change: `✏️ <b>${what}</b> — মোট ৳${next}` }));
+  return { ok: true, total: next, warning: courierWarning(o) };
 }
 
 export async function updateNote(id, note) {
