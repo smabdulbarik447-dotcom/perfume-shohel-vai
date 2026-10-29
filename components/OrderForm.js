@@ -215,19 +215,15 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
             {T("privacy", "Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.")}
           </p>
           {error && <p className="error">{error}</p>}
+          {callBox && (
+            <>
+              <p className="error">{callBox.text}</p>
+              <a className="btn btn-block call-btn" href={`tel:${callBox.phone}`}>📞 এখনই কল করুন: {callBox.phone}</a>
+            </>
+          )}
           <button className="btn btn-block" disabled={status === "loading"}>
             {status === "loading" ? "⏳ অর্ডার যাচাই হচ্ছে, একটু অপেক্ষা করুন..." : `${T("submit_btn", "অর্ডার করুন")}  ৳ ${tk(total)}`}
           </button>
-          {callBox && (
-            <div className="call-overlay" role="dialog" aria-modal="true" onClick={() => setCallBox(null)}>
-              <div className="call-box" onClick={(e) => e.stopPropagation()}>
-                <div className="call-icon">📞</div>
-                <p>{callBox.text}</p>
-                <a className="btn btn-block" href={`tel:${callBox.phone}`}>📞 কল করুন {callBox.phone}</a>
-                <button type="button" className="call-close" onClick={() => setCallBox(null)}>বন্ধ করুন</button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </form>

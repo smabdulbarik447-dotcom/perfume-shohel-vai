@@ -386,18 +386,9 @@ button { font: inherit; cursor: pointer; }
 .privacy { font-size: .8rem; color: var(--muted); margin-bottom: 14px; }
 .error { color: var(--red); font-weight: 600; margin-bottom: 10px; }
 
-/* Courier rating kom — order na niye call korte bola popup */
-.call-overlay {
-  position: fixed; inset: 0; z-index: 1000; padding: 16px;
-  display: grid; place-items: center; background: rgba(0, 0, 0, .7);
-}
-.call-box {
-  width: 100%; max-width: 380px; padding: 28px 22px; border-radius: 18px; text-align: center;
-  background: var(--card); border: 1px solid var(--gold); box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
-}
-.call-box .call-icon { font-size: 2.6rem; margin-bottom: 8px; }
-.call-box p { margin-bottom: 18px; line-height: 1.6; font-weight: 600; }
-.call-box .call-close { margin-top: 12px; background: none; border: 0; color: var(--muted); cursor: pointer; font: inherit; }
+/* Courier rating kom — order na niye call korte bola (order button er upore sobuj button) */
+.btn.call-btn { background: #16a34a; color: #fff; margin-bottom: 10px; animation: none; box-shadow: 0 10px 30px rgba(22, 163, 74, .3); }
+.btn.call-btn:hover { background: #15803d; box-shadow: 0 14px 34px rgba(22, 163, 74, .4); }
 
 .success { text-align: center; padding: 50px 24px; }
 .success-icon {
