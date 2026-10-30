@@ -5,6 +5,7 @@ import { getSettings, getProducts, deliveryOptions, deliveryCharge } from "@/lib
 import { checkOrder, clientIp } from "@/lib/fraud";
 import { notifyNewOrder } from "@/lib/telegram";
 import { bdCheckOrder, bdLookup, bdRatio } from "@/lib/bdcourier";
+import { sendPurchase } from "@/lib/fbcapi";
 
 export async function POST(req) {
   const body = await req.json().catch(() => null);
@@ -65,8 +66,9 @@ export async function POST(req) {
     await sql`UPDATE products SET stock = GREATEST(stock - ${qty}, 0) WHERE id = ${product.id}`;
     await sql`DELETE FROM incomplete_orders WHERE phone = ${body.phone}`;
     revalidatePath("/admin", "layout");
-    // Customer ke wait na koriye BD Courier check kore, tarpor (fol shoho) Telegram e pathay
+    // Customer ke wait na koriye: Facebook e Purchase (server), BD Courier check, tarpor (fol shoho) Telegram
     after(async () => {
+      await sendPurchase(row.id).catch((err) => console.error("FB Purchase failed", err));
       await bdCheckOrder(row.id);
       await notifyNewOrder(row.id);
     });

@@ -114,7 +114,15 @@ export default function OrderForm({ products, delivery, freeBoxes = 0, text = {}
         }
         throw new Error(data.error);
       }
-      // Purchase ekhane pathai na — admin কনফার্ম korle server theke (Conversions API) jay
+      // Order hoyar sathe sathe Purchase — server o eki event_id e pathay, Facebook duita ke ekta-i gone
+      if (data.id) {
+        window.fbq?.(
+          "track",
+          "Purchase",
+          { value: total, currency: "BDT", content_ids: [String(selected.id)], content_type: "product", num_items: totalBoxes },
+          { eventID: `purchase-${data.id}` }
+        );
+      }
       window.dataLayer?.push({ event: "order_placed", value: total, currency: "BDT" });
       // TikTok e order (PlaceAnOrder) — Purchase/CompletePayment na, karon COD order ekhono confirm hoyni
       window.ttq?.track("PlaceAnOrder", { ...ttContent(selected), value: total, currency: "BDT" });
