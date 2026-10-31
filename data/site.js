@@ -21,12 +21,12 @@ export const site = {
 
   gallery: [
     "/images/main.jpeg",
-    "/images/combo.png",
+    "/images/combo.webp",
     "/images/hawas-ice.avif",
     "/images/sauvage.avif",
     "/images/hawas-fire.webp",
     "/images/vampire-blood.avif",
-    "/images/gift.png",
+    "/images/gift.webp",
   ],
 
   features: [

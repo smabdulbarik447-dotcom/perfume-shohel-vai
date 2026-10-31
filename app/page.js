@@ -41,7 +41,7 @@ export default async function Home() {
   const L = content.lists;
   const fill = (str) => fillTokens(str, vars);
   // Banner er chobi gulo i dekhay (prothom ta boro kore); banner khali thakle mul product er chobi
-  const productImage = main.image || "/images/combo.png";
+  const productImage = main.image || "/images/combo.webp";
   const banners = s.gallery.split("\n").map((x) => x.trim()).filter(Boolean);
   const gallery = banners.length ? banners : [productImage];
   const freeBoxes = Number(s.free_delivery_boxes) || 0;
@@ -58,7 +58,7 @@ export default async function Home() {
   );
   const perfumes = L.perfumes.map((p, i) => ({
     ...p,
-    image: p.image || site.perfumes[i]?.image || "/images/combo.png",
+    image: p.image || site.perfumes[i]?.image || "/images/combo.webp",
     notes: String(p.notes || "").split(",").map((x) => x.trim()).filter(Boolean),
   })).filter((p) => p.name || p.short);
 
@@ -122,7 +122,7 @@ export default async function Home() {
               </div>
 
               <div className="gift-note">
-                <img src="/images/gift.png" alt="Secret Perfume 6ml" />
+                <img src="/images/gift.webp" alt="Secret Perfume 6ml" />
                 <div>
                   <b>{t("gift_title")}</b>
                   <p>{t("gift_sub")}</p>
@@ -160,7 +160,7 @@ export default async function Home() {
       <section className="section alt">
         <div className="container gift-grid">
           <div className="gift-img">
-            <img src="/images/gift.png" alt="Secret Perfume 6ml" />
+            <img src="/images/gift.webp" alt="Secret Perfume 6ml" />
           </div>
           <div>
             <span className="eyebrow">{t("gift_eyebrow")}</span>
